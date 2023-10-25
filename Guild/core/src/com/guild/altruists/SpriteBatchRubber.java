@@ -3,7 +3,7 @@ package com.guild.altruists;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
+//Вспомогательный класс для корректной работы приложения при любом разрешении
 public class SpriteBatchRubber {
     SpriteBatch batch;
     double wpw;

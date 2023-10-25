@@ -1,5 +1,5 @@
 package com.guild.altruists;
-
+//Класс, отвечающий за листы с задачами
 public class Back {
     Guild g;
     String task;
@@ -24,7 +24,7 @@ public class Back {
         this.hour = hour;
         this.state=state;
     }
-    public void draw(){
+    public void draw(){//Отрисовка листов
         g.drawer.draw(g.back_2, g.stepx/(g.backn*3)+x* g.stepx, -g.cy+g.height-g.stepy-y*g.stepy, g.stepx, g.stepy);
         String text1 = task.substring(0, task.length());
         String text2 = "";

@@ -18,18 +18,16 @@ import java.util.Random;
 import javax.naming.Context;
 
 import sun.awt.im.InputMethodManager;
-
+//Основной класс
 public class Guild extends ApplicationAdapter {
 	SpriteBatch batch;
 	SpriteBatchRubber drawer;
 	Preferences safes;
 	Random random = new Random();
-	Texture back_1, back_2, back_2_2, back_3, back_4, back_5, back_6, back_7, back_8, back_9, dark;
+	Texture back_1, back_2, back_2_2, back_3, back_4, back_5, back_6, back_7, back_8, back_9, back_10, dark;//Текстуры
 	BitmapFont font_1, font_2, font_3;
 	FreeTypeFontGenerator generator;
 	FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-	//Music music_1;
-	//Sound sound_1;
 	public static final String FONT_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;,{}\"´`'<>:";
 	int backq = 50;
 	int backn = 3;
@@ -56,7 +54,6 @@ public class Guild extends ApplicationAdapter {
 	boolean snd;
 	boolean touchedgreen=false;
 	boolean keyboard=false;
-
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -75,7 +72,6 @@ public class Guild extends ApplicationAdapter {
 		parameter.size = (int)(15.0*wpw);
 		parameter.borderWidth = 0.5f;
 		parameter.borderColor = Color.WHITE;
-
 		font_1 = generator.generateFont(parameter);
 		font_1.setColor(Color.BLACK);
 		parameter.size = (int)(20.0*wpw);
@@ -84,14 +80,7 @@ public class Guild extends ApplicationAdapter {
 		parameter.size = (int)(10.0*wpw);
 		font_3 = generator.generateFont(parameter);
 		font_3.setColor(Color.BLACK);
-		/*music_1 = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
-		music_1.setVolume(0.25f);
-		music_1.setLooping(true);
-		if(snd) {
-			music_1.play();
-		}*/
-		//sound_1 = Gdx.audio.newSound(Gdx.files.internal("sound_1.mp3"));
-		back_1 = new Texture("back_1.png");
+		back_1 = new Texture("back_1.png");//Текстуры
 		back_2 = new Texture("back_2.png");
 		back_2_2 = new Texture("back_2_2.png");
 		back_3 = new Texture("back_3.png");
@@ -101,14 +90,12 @@ public class Guild extends ApplicationAdapter {
 		back_7 = new Texture("back_7.png");
 		back_8 = new Texture("back_8.png");
 		back_9 = new Texture("back_9.png");
+		back_10 = new Texture("back_10.png");
 		dark = new Texture("dark.png");
 		for(int i=0;i<backq;i++){
-			backs[i] = new Back(this, "TEXT_"+i, i%backn, i/backn,23, 10, 25, 20, 3);
+			backs[i] = new Back(this, "TEXT_"+i, i%backn, i/backn,23, 10, 25, 20, 3);//Листы
 		}
-		//backs[0].state=0;
-		Gdx.input.setCatchBackKey(true);
 		Gdx.input.setInputProcessor(new GuildInput(this));
-
 	}
 	public void GetSaves(){
 		if(safes.contains("snd")) {
@@ -116,9 +103,8 @@ public class Guild extends ApplicationAdapter {
 		}
 	}
 	@Override
-	public void render () {
-		if (reg == 0) {
-			//keyboard = Gdx.input.isPeripheralAvailable(Input.Peripheral.OnscreenKeyboard);
+	public void render () {//Рендер
+		if (reg == 0) {//Вся математика, анимации
 			for(int i=0;i<backq;i++) {
 				if (backs[i].state != 3) {
 					backs[i].x = i % backn;
@@ -174,14 +160,13 @@ public class Guild extends ApplicationAdapter {
 				cy = -height;
 			}
 			ScreenUtils.clear(0, 0, 0, 1);
-			batch.begin();
+			batch.begin();//Отрисовка интерфейса
 			drawer.draw(back_1, 0, -cy, width, height/2);
 			drawer.draw(back_1, 0, -cy+height/2, width, height/2);
 			if (cy<0){
 				drawer.draw(back_1, 0, -cy, width, -height/2);
 				drawer.draw(back_1, 0, -cy-height, width, height/2);
 			}
-			//font_1.draw(batch, "PLAY", (width / 2 - 150) * wpw, (350) * hph);
 			for(int i=0;i<backq;i++){
 				if (backs[i].state!=3) {
 					backs[i].draw();
@@ -196,9 +181,8 @@ public class Guild extends ApplicationAdapter {
 				drawer.draw(back_8, -width * (0.5f) + (1 - scale) * width / 2 + width / 2 - width / 20, -button_3_y + width / 4 + scale * width / 8f + (1 - scale) * height / 4, width * 1.1f * scale, width * 0.5f);
 			}else{
 				drawer.draw(back_2_2, -width * (0.5f) + (1 - scale) * width / 2 + width / 2 - width / 20, -button_3_y + (1 - scale) * height / 2, width * 1.1f * scale, width * 1.1f * scale);
-				//drawer.draw(back_8, -width * (0.5f) + (1 - scale) * width / 2 + width / 2 - width / 20, -button_3_y + width / 3 + scale * width / 8f + (1 - scale) * height / 4, width * 1.1f * scale, width * 0.5f);
 			}
-			String text1 = text.substring(0, text.length());
+			String text1 = text.substring(0, text.length());//Просчёт текста
 			String text2 = "";
 			String text3 = "";
 			String text4 = "";
@@ -223,37 +207,12 @@ public class Guild extends ApplicationAdapter {
 				font_2.draw(batch, text3, (width / 2 - text3.length() * 5.5f) * wpw, (-button_3_y + width / 2 + width / 3 - width / 10 + (1 - scale) * height / 4) * hph);
 				font_2.draw(batch, text4, (width / 2 - text4.length() * 5.5f) * wpw, (-button_3_y + width / 2 + width / 3 - width / 20 - width / 10 + (1 - scale) * height / 4) * hph);
 			}
-				//font_1.draw(batch, text1, (width / 2 - text1.length() * 2) * wpw-(1-scale)*width/20, (-button_3_y + width / 2+width/3 + (1 - scale) * height / 8) * hph);
-				//font_1.draw(batch, text2, (width / 2 - text2.length() * 2) * wpw-(1-scale)*width/20, (-button_3_y + width / 2+width/3 - width / 20 + (1 - scale) * height / 8) * hph);
-
 			drawer.draw(back_4, width / 2 - 75 * button_1_s, -75 * button_1_s - button_1_y, 150 * button_1_s, 150 * button_1_s);
 			drawer.draw(back_9, width / 2 - 25,  - button_4_y, 50*button_4_s, 50*button_4_s);
 			drawer.draw(back_5, width-100, -button_2_y, 100*button_2_s, 100*button_2_s);
 			drawer.draw(back_6, 10, -button_2_y, 75*button_2_s, 75*button_2_s);
+			drawer.draw(back_3, 0, height-height/20, width, height/20);
 			batch.end();
 		}
-	}
-	public int hits(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
-		if (x2 > x1 && x2 + w2 < x1 + w1 && y2 > y1 && y2 < y1 + h1) {
-			return 1;
-		}
-		if (x2 < x1 + w1 && x2 > x1 && y2 > y1 && y2 + h2 < y1 + h1) {
-			return 2;
-		}
-		if (x2 > x1 && x2 + w2 < x1 + w1 && y2 + h2 > y1 && y2 + h2 < y1 + h1) {
-			return 3;
-		}
-		if (x2 + w2 > x1 && x2 + w2 < x1 + w1 && y2 > y1 && y2 + h2 < y1 + h1) {
-			return 4;
-		}
-		if (x2 < x1 + w1 && x2 + w2 > x1 && y2 < y1 + h1 && y2 + h2 > y1) {
-			return 5;
-		}
-		return 0;
-	}
-	public boolean hit(float x1, float y1, float r1, float x2, float y2, float r2) {
-		float dx = Math.abs(x1 - x2);
-		float dy = Math.abs(y1 - y2);
-		return Math.sqrt(dx*dx+dy*dy)<=r1+r2;
 	}
 }
