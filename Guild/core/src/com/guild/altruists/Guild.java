@@ -33,7 +33,7 @@ public class Guild extends ApplicationAdapter {
 	public static final String FONT_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;,{}\"´`'<>:";
 	int backq = 50;
 	int backn = 3;
-	int backo = 1;
+	int backo = 0;
 	Back[] backs = new Back[backq];
 	float wpw, hph;
 	float width, height;
@@ -103,9 +103,9 @@ public class Guild extends ApplicationAdapter {
 		back_9 = new Texture("back_9.png");
 		dark = new Texture("dark.png");
 		for(int i=0;i<backq;i++){
-			backs[i] = new Back(this, "Popa"+i, i%backn, i/backn,23, 10, 25, 20, 3);
+			backs[i] = new Back(this, "TEXT_"+i, i%backn, i/backn,23, 10, 25, 20, 3);
 		}
-		backs[0].state=0;
+		//backs[0].state=0;
 		Gdx.input.setCatchBackKey(true);
 		Gdx.input.setInputProcessor(new GuildInput(this));
 
@@ -145,7 +145,11 @@ public class Guild extends ApplicationAdapter {
 				}else {
 					button_3_y += (-height / 20 - button_3_y) / 5f;
 				}
-				button_4_y+=(-button_4_y)/5f;
+				if (keyboard) {
+					button_4_y += (200-button_4_y) / 5f;
+				}else{
+					button_4_y += (-button_4_y) / 5f;
+				}
 			}
 			if (mode==0){
 				scale+=(1-scale)/5;
