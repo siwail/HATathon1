@@ -152,7 +152,29 @@ public class GuildInput implements InputProcessor {
                 game.full_mode=false;
                 return false;
             }
-
+            if (game.choosed!=-1 && screenX >= SX(game.width*0.25f) && screenX <= SX(game.width*0.75f) && screenY >= SY(-game.button_3_y-game.scroll_y + game.width / 80+game.width/10) && screenY <= SY(-game.button_3_y-game.scroll_y + game.width / 80)) {
+                boolean a=false;
+                for (int i=0;i<3;i++){
+                    if(game.account_tasks[i]==-1){
+                        a=true;
+                        break;
+                    }
+                }
+                for (int i=0;i<3;i++){
+                    if (game.account_tasks[i]==game.choosed){
+                        a=false;
+                        break;
+                    }
+                }
+                if(a) {
+                    game.mode = 0;
+                    game.button_4_s -= 0.1f;
+                    game.full_mode = false;
+                    game.AcceptTask();
+                    game.choosed = -1;
+                }
+                return false;
+            }
             if (game.choosed==-1&&game.mode==1 &&!game.keyboard && screenX >= SX(0) && screenX <= SX(game.width) && screenY >= SY(game.height/2+200) && screenY <= SY(game.height/2-200)) {
                 game.touchedgreen=true;
             }

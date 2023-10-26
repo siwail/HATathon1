@@ -49,8 +49,8 @@ public class Guild extends ApplicationAdapter {
 	Preferences safes;
 	Random random = new Random();
 	Sound sound_1, sound_2, sound_3, sound_4, sound_5, sound_6;
-	Texture back_1, back_2, back_2_2, back_3, back_4, back_5, back_6, back_7, back_8, back_9, back_10, back_11, dark, up, down, full, top, bottom;//Текстуры
-	BitmapFont font_1, font_2, font_3, font_4;
+	Texture back_1, back_2, back_2_2, back_3, back_4, back_5, back_6, back_7, back_8, back_9, back_10, back_11, back_12, dark, up, down, full, top, bottom;//Текстуры
+	BitmapFont font_1, font_2, font_3, font_4, font_5;
 	FreeTypeFontGenerator generator;
 	FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 	public static final String FONT_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;,{}\"´`'<>:";
@@ -72,6 +72,8 @@ public class Guild extends ApplicationAdapter {
 	float button_3_s=1;
 	float button_4_y=200;
 	float button_4_s=1;
+	float button_5_y=0;
+	float downmenu_y=0;
 	float scroll_y = 0;
 	float scaley = 0;
 	float updown_x=0;
@@ -97,6 +99,9 @@ public class Guild extends ApplicationAdapter {
 	int account_id = 0;
 	String account_login = "femboychik228";
 	String account_password = "lolkek2";
+	int account_money = 0;
+	int account_level = 0;
+	int[] account_tasks = new int[]{-1,-1,-1};
 	String[] logins = new String[300];
 	String[] passwords = new String[300];
 	int logpasq, backinfq;
@@ -118,26 +123,28 @@ public class Guild extends ApplicationAdapter {
 				logins[i] = splitted2[0];
 				passwords[i] = splitted2[1];
 			}
+			logpasq = i;
+			Gdx.app.log("", "" + i);
+
+			boolean access = false;
+			for (i=0;i<logpasq;i++){
+				if (logins[i].equals(account_login)){
+					if (passwords[i].equals(account_password)){
+						account_id = i;
+						access=true;
+						break;
+					}
+				}
+			}
+			if(!access){
+				enter.writeString("}}}}"+account_login+"----"+account_password, true);
+				account_id = i;
+			}
 		}
 		else{
 			enter.writeString(account_login+"----"+account_password, true);
-			logins[0]=account_login;
-			passwords[0]=account_password;
 		}
-		logpasq = i+1;
-		boolean access = false;
-		for (i=0;i<logpasq;i++){
-			if (logins[i].equals(account_login)){
-				if (passwords[i].equals(account_password)){
-					account_id = i;
-					access=true;
-					break;
-				}
-			}
-		}
-		if(!access){
-			//Gdx.app.exit();
-		}
+
 
 		Gdx.app.log("Entered by: "+account_login, ""+account_id);
 
@@ -190,6 +197,11 @@ public class Guild extends ApplicationAdapter {
 		drawer = new SpriteBatchRubber(this, batch);
 		generator = new FreeTypeFontGenerator(Gdx.files.internal("font.ttf"));
 		parameter.characters = FONT_CHARACTERS;
+		parameter.size = (int)(20.0*wpw);
+		parameter.borderWidth = 1f;
+		parameter.borderColor = Color.BLACK;
+		font_5 = generator.generateFont(parameter);
+		font_5.setColor(Color.WHITE);
 		parameter.size = (int)(15.0*wpw);
 		parameter.borderWidth = 0.5f;
 		parameter.borderColor = Color.WHITE;
@@ -217,6 +229,7 @@ public class Guild extends ApplicationAdapter {
 		back_9 = new Texture("back_9.png");
 		back_10 = new Texture("back_10.png");
 		back_11 = new Texture("back_11.png");
+		back_12 = new Texture("back_12.png");
 		dark = new Texture("dark.png");
 		up = new Texture("up.png");
 		down = new Texture("down.png");
@@ -233,6 +246,17 @@ public class Guild extends ApplicationAdapter {
 	public void AddBack(){
 		Back b = backs[backo];
 		back.writeString(b.task+"----"+b.bigtext+"----"+b.year+"----"+b.month+"----"+b.day+"----"+b.x+"----"+b.y+"----"+b.account+"}}}}", true);
+	}
+	public void AcceptTask(){
+		int i=0;
+		for (;i<3;i++){
+			if(account_tasks[i]==-1){
+				break;
+			}
+		}
+		if(i!=3){
+			account_tasks[i]=choosed;
+		}
 	}
 	@Override
 	public void render () {//Рендер
@@ -260,6 +284,7 @@ public class Guild extends ApplicationAdapter {
 					button_1_y += (-height/2+100-button_1_y) / 5f;
 					button_1_s += (0.5-button_1_s)/5f;
 				}
+				button_5_y += (height-button_5_y)/5f;
 				button_2_y += (-button_2_y) / 5f;
 				if (keyboard){
 					button_3_y += (-height / 2+75 - button_3_y) / 5f;
@@ -281,6 +306,7 @@ public class Guild extends ApplicationAdapter {
 				if (scale>0.9){
 					scale=1;
 				}
+				button_5_y += (-button_5_y)/5f;
 				button_1_y += (-button_1_y) / 5f;
 				button_1_s += (1-button_1_s)/5f;
 				button_2_y+=(200-button_2_y)/5f;
@@ -325,6 +351,35 @@ public class Guild extends ApplicationAdapter {
 				drawer.draw(back_8, -width * (0.5f) + (1 - scale) * width / 2 + width / 2 - width / 20, -button_3_y-scroll_y+scaley + width / 4 + scale * width / 8f + (1 - scale) * height / 4, width * 1.1f * scale, width * 0.5f);
 			}else{
 				drawer.draw(back_2_2, -width * (0.5f) + (1 - scale) * width / 2 + width / 2 - width / 20, -button_3_y-scroll_y + (1 - scale) * height / 2, width * 1.1f * scale, (width+scaley) * 1.1f * scale);
+			}
+			int q=0;
+			for (int i=0;i<3;i++){
+				if(account_tasks[i]!=-1){
+					q++;
+				}
+			}
+			if (choosed!=-1) {
+				if (backs[choosed].account!=account_id) {
+					drawer.draw(back_10, width*0.25f, -button_3_y-scroll_y + width / 80, width * 0.5f * scale, (width/10));
+					boolean a=false;
+					for (int i=0;i<3;i++){
+						if(account_tasks[i]==-1){
+							a=true;
+							break;
+						}
+					}
+					for (int i=0;i<3;i++){
+						if (account_tasks[i]==choosed){
+							a=false;
+							break;
+						}
+					}
+					if(a) {
+						font_4.draw(batch, "Принять задание!", (width * 0.25f + width * 0.1f) * wpw, (-button_3_y - scroll_y + width / 20 + width / 80) * hph);
+					}else{
+						font_4.draw(batch, "Взято заданий "+q+"/3", (width * 0.25f + width * 0.1f) * wpw, (-button_3_y - scroll_y + width / 20 + width / 80) * hph);
+					}
+				}
 			}
 			String text = this.text;
 			if(choosed!=-1){
@@ -412,6 +467,8 @@ public class Guild extends ApplicationAdapter {
 			drawer.draw(back_3, 0, 0, width, height/20);
 			if (choosed==-1) {
 				drawer.draw(back_4, width / 2 - 75 * button_1_s, -75 * button_1_s - button_1_y, 150 * button_1_s, 150 * button_1_s);
+				drawer.draw(back_12, width - 100, 0 - button_5_y, 100, 100);
+				font_5.draw(batch, q+"/3", (width - 150) * wpw, (- button_5_y+height/30f) * hph);
 			}
 			drawer.draw(back_9, width / 2 - 25,  -button_4_y, 50*button_4_s, 50*button_4_s);
 
