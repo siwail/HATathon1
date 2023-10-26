@@ -3,7 +3,7 @@ package com.guild.altruists;
 public class Back {
     Guild g;
     String task;
-    String text;
+    String bigtext;
     int year;
     int month;
     int day;
@@ -13,11 +13,13 @@ public class Back {
     int y = 0;
     int s = 1;
     int state=3;
+    int account = 0;
     Back(Guild game, String task, int x, int y, int year, int month, int day, int hour, int state){
         g=game;
         this.x=x;
         this.y=y;
         this.task = task;
+        bigtext="";
         this.year = year;
         this.month = month;
         this.day = day;
@@ -45,6 +47,9 @@ public class Back {
             text3 = task.substring(40, 60);
             text4 = task.substring(60, task.length());
         }
+        if (g.account_id==account) {
+            g.font_4.draw(g.batch, "Ваша заявка!", (g.stepx / (g.backn * 3) + x * g.stepx + g.stepx / 8) * g.wpw, (-g.cy + g.height - y * g.stepy - g.stepy/8) * g.hph);
+        }
         if (task.length()<=10) {
             g.font_1.draw(g.batch, task, (g.stepx / (g.backn * 3) + x * g.stepx + g.stepx / 8) * g.wpw, (-g.cy + g.height - y * g.stepy - g.stepy / 4) * g.hph);
         }else{
@@ -52,7 +57,8 @@ public class Back {
             g.font_3.draw(g.batch, text2, (g.stepx / (g.backn * 3) + x * g.stepx + g.stepx / 8) * g.wpw, (-g.cy + g.height - y * g.stepy - g.stepy / 4 - g.stepy / 8) * g.hph);
             g.font_3.draw(g.batch, text3, (g.stepx / (g.backn * 3) + x * g.stepx + g.stepx / 8) * g.wpw, (-g.cy + g.height - y * g.stepy - g.stepy / 4 - g.stepy / 8 - g.stepy / 8) * g.hph);
             g.font_3.draw(g.batch, text4, (g.stepx / (g.backn * 3) + x * g.stepx + g.stepx / 8) * g.wpw, (-g.cy + g.height - y * g.stepy - g.stepy / 4  - g.stepy / 8 - g.stepy / 8 - g.stepy / 8) * g.hph);
+
         }
-        g.font_1.draw(g.batch, "До "+day+"."+month+"."+year, (g.stepx/(g.backn*3)+x* g.stepx+g.stepx/4) * g.wpw, (-g.cy+g.height-y*g.stepy-g.stepy/4*3) * g.hph);
+        g.font_1.draw(g.batch, "До "+day+"."+month+"."+year, (g.stepx/(g.backn*3)+x* g.stepx+g.stepx/8) * g.wpw, (-g.cy+g.height-y*g.stepy-g.stepy/4*3) * g.hph);
     }
 }
