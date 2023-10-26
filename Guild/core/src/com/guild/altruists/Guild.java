@@ -52,8 +52,8 @@ public class Guild extends ApplicationAdapter {
 	Preferences safes;
 	Random random = new Random();
 	Sound sound_1, sound_2, sound_3, sound_4, sound_5, sound_6;
-	Texture back_1, back_2, back_2_2, back_3, back_4, back_5, back_6, back_7, back_8, back_9, back_10, back_11, back_12, back_13, back_14, dark, up, down, full, top, bottom, profile, white, dio_1, dio_2, dio_3, dio_4, dio_5, ding;//Текстуры
-	BitmapFont font_1, font_2, font_3, font_4, font_5;
+	Texture back_1, back_2, back_2_2, back_3, back_4, back_5, back_6, back_7, back_8, back_9, back_10, back_11, back_12, back_13, back_14, dark, up, down, full, top, bottom, profile, white, dio_1, dio_2, dio_3, dio_4, dio_5, ding, press;//Текстуры
+	BitmapFont font_1, font_2, font_3, font_4, font_5, font_6;
 	FreeTypeFontGenerator generator;
 	FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 	public static final String FONT_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;,{}\"´`'<>:";
@@ -81,6 +81,9 @@ public class Guild extends ApplicationAdapter {
 	float scaley = 0;
 	float updown_x=0;
 	float profile_y=0;
+	float press_s=1;
+	int category=0;
+	int level = 1;
 	int mode=0;
 	int reg = 1;
 	int textmode=0;
@@ -91,39 +94,45 @@ public class Guild extends ApplicationAdapter {
 	int year;
 	int month;
 	int day;
-
 	int yeard;
 	int monthd;
 	int dayd;
 	float scale = 1;
 	boolean full_mode=false;
-	boolean snd;
+	int register_choose=0;
+	String result;
+	String file="";
 	boolean touchedgreen=false;
 	boolean keyboard=false;
 	boolean downmenu=false;
 	boolean profile_touched=false;
-	FileHandle back, enter, name, money, level;
-	int account_id = 0;
-	String account_login = "femboychik228";
-	String account_password = "lolkek2";
-	String account_name = "Егор Летов";
+	volatile boolean waiting_server=false;
+	int waiting_ticks=0;
+	int tickets = 0;
+	int account_id = -1;
+	String account_login = "";
+	String account_password = "" ;
+	String account_name = "";
 	int account_money = 0;
-	int account_level = 0;
-	double[] account_exp = new double[]{0.1, 0.5, 0.9, 0.1, 1};
+	float[] account_exp = new float[]{0.1f, 0.1f, 0.1f, 0.1f, 0.1f};
 	int[] account_tasks = new int[]{-1,-1,-1};
-	String[] logins = new String[300];
-	String[] passwords = new String[300];
-	int logpasq, backinfq;
-	TotalMove[] d = new TotalMove[100];
+	String[] dfile = new String[100];
+	String[] dtext = new String[100];
+	String rtext = "";
+	int[] dt = new int[100];
 	Guild t;
 	@Override
 	public void create () {
 		t=this;
 		for (int i=0;i<100;i++){
-			d[i]=new TotalMove("clear");
+			dfile[i]="";
+			dtext[i]="";
+			dt[i]=-1;
 		}
-		Gdx.app.log("", "myaaa");
-		enter = Gdx.files.local("enter.txt");
+		safes = Gdx.app.getPreferences("Save");
+		GetSaves();
+		int i = 0;
+		/*enter = Gdx.files.local("enter.txt");
 		enter.writeString("", true);
 		back = Gdx.files.local("back.txt");
 		back.writeString("", true);
@@ -164,9 +173,8 @@ public class Guild extends ApplicationAdapter {
 		else{
 			enter.writeString(account_login+"----"+account_password, true);
 		}
+*/
 
-
-		Gdx.app.log("Entered by: "+account_login, ""+account_id);
 
 		Calendar c = Calendar.getInstance();
 		year = c.get(Calendar.YEAR);
@@ -175,10 +183,11 @@ public class Guild extends ApplicationAdapter {
 		yeard=year%100;
 		monthd=month;
 		dayd=day;
+
 		for(i=0;i<backq;i++){
 			backs[i] = new Back(this, "TEXT_"+i, i%backn, i/backn,year%100, month, day, 20, 3);//Листы
 		}
-
+/*
 		String back_info = back.readString("windows-1251");
 		if(!back_info.equals("")) {
 			String[] splitted = back_info.split(Pattern.quote("}}}}"));
@@ -197,7 +206,7 @@ public class Guild extends ApplicationAdapter {
 			}
 			backinfq = i;
 			backo = backinfq;
-		}
+		}*/
 		sound_1 = Gdx.audio.newSound(Gdx.files.internal("sound_1.mp3"));
 		sound_2 = Gdx.audio.newSound(Gdx.files.internal("sound_2.mp3"));
 		sound_3 = Gdx.audio.newSound(Gdx.files.internal("sound_3.mp3"));
@@ -206,8 +215,7 @@ public class Guild extends ApplicationAdapter {
 		sound_6 = Gdx.audio.newSound(Gdx.files.internal("sound_6.mp3"));
 		batch = new SpriteBatch();
 		shape = new ShapeRenderer();
-		safes = Gdx.app.getPreferences("Save");
-		GetSaves();
+
 		height = 1087.5f;
 		width = 506.25f;
 		cy=height/20;
@@ -234,6 +242,9 @@ public class Guild extends ApplicationAdapter {
 		parameter.size = (int)(15.0*wpw);
 		font_4 = generator.generateFont(parameter);
 		font_4.setColor(Color.GOLD);
+		parameter.size = (int)(35.0*wpw);
+		font_6 = generator.generateFont(parameter);
+		font_6.setColor(Color.GOLD);
 		parameter.size = (int)(10.0*wpw);
 		font_3 = generator.generateFont(parameter);
 		font_3.setColor(Color.BLACK);
@@ -266,6 +277,7 @@ public class Guild extends ApplicationAdapter {
 		profile = new Texture("profile.png");
 		white = new Texture("white.png");
 		ding = new Texture("ding.png");
+		press = new Texture("press.png");
 		Gdx.input.setInputProcessor(new GuildInput(this));
 		Thread online = new Thread(){
 			@Override
@@ -279,14 +291,49 @@ public class Guild extends ApplicationAdapter {
 		};
 		online.start();
 	}
+	public void UpdateBacks(){
+		Thread register = new Thread(){
+			@Override
+			public void run() {
+				for (int i = 0; i < backq; i++) {
+					if (backs[i].state != 3) {
+						dt[3] = 0;
+						dtext[3] = backs[i].x + "&" + backs[i].y + "&" + backs[i].task + "&" + backs[i].bigtext + "&" + backs[i].year + "&" + backs[i].month + "&" + backs[i].day + "&" + backs[i].index + "&" + backs[i].account + "&" + backs[i].category + "&" + backs[i].level;
+						dfile[3] = "/backs/back_"+i+".txt";
+					}
+				}
+			}
+		};
+		register.start();
+	}
+	public void UpdatePerson(){
+		Thread register = new Thread(){
+			@Override
+			public void run(){
+				dt[2]=0;
+				dtext[2]=account_login+"&"+account_password+"&"+account_name+"&"+account_money+"&"+account_exp[0]+"&"+account_exp[1]+"&"+account_exp[2]+"&"+account_exp[3]+"&"+account_exp[4]+"&"+account_tasks[0]+"&"+account_tasks[1]+"&"+account_tasks[2];
+				dfile[2]="/logins/"+account_id+".txt";
+			}
+		};
+		register.start();
+	}
+	public String GetServer(String file){
+		t.file = file;
+		t.waiting_server=true;
+		t.waiting_ticks=0;
+		boolean wait=true;
+		while(wait){wait=waiting_server;}
+		t.file="";
+		return result;
+	}
 	public void GetSaves(){
-		if(safes.contains("snd")) {
-			snd = safes.getBoolean("snd");
+		if(safes.contains("account_id")) {
+			account_id = safes.getInteger("account_id");
 		}
+		Gdx.app.log(account_id+"", "");
 	}
 	public void AddBack(){
-		Back b = backs[backo];
-		back.writeString(b.task+"----"+b.bigtext+"----"+b.year+"----"+b.month+"----"+b.day+"----"+b.x+"----"+b.y+"----"+b.account+"}}}}", true);
+		UpdateBacks();
 	}
 	public void AcceptTask(){
 		int i=0;
@@ -298,17 +345,107 @@ public class Guild extends ApplicationAdapter {
 		if(i!=3){
 			account_tasks[i]=choosed;
 			sound_2.play(0.5f);
+			UpdatePerson();
 		}
+	}
+	public void Register(){
+		sound_6.play();
+		Thread register = new Thread(){
+			@Override
+			public void run(){
+				account_id=random.nextInt(3000)+1;
+				dt[1]=0;
+				dtext[1]=account_login+"&"+account_password+"&"+account_name+"&"+account_money+"&"+account_exp[0]+"&"+account_exp[1]+"&"+account_exp[2]+"&"+account_exp[3]+"&"+account_exp[4]+"&"+account_tasks[0]+"&"+account_tasks[1]+"&"+account_tasks[2];
+				dfile[1]="/logins/"+account_id+".txt";
+				safes.putInteger("account_id", account_id);
+				safes.flush();
+				Sleep(1000);
+				reg=0;
+			}
+		};
+		register.start();
 	}
 	@Override
 	public void render () {//Рендер
+		if (reg==2) {
+			ScreenUtils.clear(0.1f, 0, 0, 1);
+			batch.begin();
+			drawer.draw(back_1, 0, 0, width, height/2);
+			drawer.draw(back_1, 0, height/2, width, height/2);
+			drawer.draw(back_3, 0, height/4*3, width, height/10);
+			drawer.draw(back_2, 0, height/4, width, width);
+			font_6.draw(batch, "Регистрация", (width/4)*wpw, (height/4*3+height/17.5f)*hph);
+			drawer.draw(dark, 0, height/2+height/10f+height/20f-height/30f+height/60f, width, height/30);
+			drawer.draw(dark, 0, height/2+height/10f-height/30f+height/60f, width, height/30);
+			drawer.draw(dark, 0, height/2+height/20f-height/30f+height/60f, width, height/30);
+			if (register_choose == 1) {
+				drawer.draw(back_11, width/8, height/2+height/10f+height/20f-height/30f+height/60f+width/40, width/40, width/40);
+			}
+			if (register_choose == 2) {
+				drawer.draw(back_11, width/8, height/2+height/10f-height/30f+height/60f+width/40, width/40, width/40);
+			}
+			if (register_choose == 3) {
+				drawer.draw(back_11, width/8, height/2+height/20f-height/30f+height/60f+width/40, width/40, width/40);
+			}
+			font_5.draw(batch, "Ваше имя: "+account_name, (width/6)*wpw, (height/2+height/10f+height/20f)*hph);
+			font_5.draw(batch, "Ваш логин: "+account_login, (width/6)*wpw, (height/2+height/10f)*hph);
+			font_5.draw(batch, "Ваш пароль: "+account_password, (width/6)*wpw, (height/2+height/20f)*hph);
+			drawer.draw(back_10, width/4, height/4, width/2, height/20);
+			font_4.draw(batch, "Зарегистрироваться", (width/4+width/15)*wpw, (height/4+height/40f)*hph);
+			batch.end();
+		}
 		if (reg==1) {
 			ScreenUtils.clear(0, 0, 0, 1);
 			batch.begin();
-			font_4.draw(batch, "Подключение к серверу...", 100, 100);
+			font_4.draw(batch, "Подключение к серверу...", 100*wpw, 100*hph);
 			batch.end();
 			if (TotalClient.connected){
-				reg=0;
+				if(account_id==-1){
+					reg=2;
+				}else{
+					Thread load = new Thread(){
+						@Override
+						public void run(){
+							String loads=GetServer("/logins/"+account_id+".txt");
+							String[] splitted = loads.split("&");
+							account_login = splitted[0];
+							account_password = splitted[1];
+							account_name = splitted[2];
+							account_money = Integer.parseInt(splitted[3]);
+							account_exp[0] = (float)Double.parseDouble(splitted[4]);
+							account_exp[1] = (float)Double.parseDouble(splitted[5]);
+							account_exp[2] = (float)Double.parseDouble(splitted[6]);
+							account_exp[3] = (float)Double.parseDouble(splitted[7]);
+							account_exp[4] = (float)Double.parseDouble(splitted[8]);
+							account_tasks[0] = Integer.parseInt(splitted[9]);
+							account_tasks[1] = Integer.parseInt(splitted[10]);
+							account_tasks[2] = Integer.parseInt(splitted[11]);
+							for(int i=0;i<backq;i++) {//dtext[3] = backs[i].x + "&" + backs[i].y + "&" + backs[i].task + "&" + backs[i].bigtext + "&" + backs[i].year + "&" + backs[i].month + "&" + backs[i].day + "&" + backs[i].index + "&" + backs[i].account;
+								String load = GetServer("/backs/back_" + i + ".txt");
+								if (!load.equals("")) {
+									backo+=1;
+									splitted = load.split("&");
+									backs[i].x=Integer.parseInt(splitted[0]);
+									backs[i].y=Integer.parseInt(splitted[1]);
+									backs[i].task=splitted[2];
+									backs[i].bigtext=splitted[3];
+									backs[i].state=0;
+									backs[i].year=Integer.parseInt(splitted[4]);
+									backs[i].month=Integer.parseInt(splitted[5]);
+									backs[i].day=Integer.parseInt(splitted[6]);
+									backs[i].index=Integer.parseInt(splitted[7]);
+									backs[i].account=Integer.parseInt(splitted[8]);
+									backs[i].category=Integer.parseInt(splitted[9]);
+									backs[i].level=Integer.parseInt(splitted[10]);
+								}
+							}
+
+
+						}
+					};
+					load.start();
+					reg=0;
+				}
 			}
 		}
 		if (reg == 0) {//Вся математика, анимации
@@ -374,6 +511,7 @@ public class Guild extends ApplicationAdapter {
 					downmenu_y+=(-downmenu_y)/5;
 				}
 			}
+			press_s+=(1-press_s);
 			if(choosed!=-1){
 				button_3_y=-height / 20;
 				button_4_y=0;
@@ -465,11 +603,42 @@ public class Guild extends ApplicationAdapter {
 				text3 = text.substring(40, 60);
 				text4 = text.substring(60, text.length());
 			}
+			int category1=category;
+			int level1=level;
+			if(choosed!=-1){
+				category1=backs[choosed].category;
+				level1=backs[choosed].level;
+			}
 			if (scale==1) {
 				font_2.draw(batch, text1, (width / 2 - text1.length() * 5.5f) * wpw, (-button_3_y-scroll_y+scaley + width / 2 + width / 3 + (1 - scale) * height / 4) * hph);
 				font_2.draw(batch, text2, (width / 2 - text2.length() * 5.5f) * wpw, (-button_3_y-scroll_y+scaley + width / 2 + width / 3 - width / 20 + (1 - scale) * height / 4) * hph);
 				font_2.draw(batch, text3, (width / 2 - text3.length() * 5.5f) * wpw, (-button_3_y-scroll_y+scaley + width / 2 + width / 3 - width / 10 + (1 - scale) * height / 4) * hph);
 				font_2.draw(batch, text4, (width / 2 - text4.length() * 5.5f) * wpw, (-button_3_y-scroll_y+scaley + width / 2 + width / 3 - width / 20 - width / 10 + (1 - scale) * height / 4) * hph);
+				drawer.draw(dark, width / 4,-button_3_y-scroll_y+scaley + width-width/16, width/2, width/30);
+
+				if(category1==0){
+					font_1.draw(batch, "Социальная деятельность", (width / 4) * wpw, (-button_3_y-scroll_y+scaley + width) * hph);
+					drawer.draw(dio_1, width / 4,-button_3_y-scroll_y+scaley + width-width/16, width/2*level1/5, width/30);
+				}
+				if(category1==1){
+					font_1.draw(batch, "Медицинская деятельность", (width / 4) * wpw, (-button_3_y-scroll_y+scaley + width) * hph);
+					drawer.draw(dio_2, width / 4,-button_3_y-scroll_y+scaley + width-width/16, width/2*level1/5, width/30);
+				}
+				if(category1==2){
+					font_1.draw(batch, "Физическая деятельность", (width / 4) * wpw, (-button_3_y-scroll_y+scaley + width) * hph);
+					drawer.draw(dio_3, width / 4,-button_3_y-scroll_y+scaley + width-width/16, width/2*level1/5, width/30);
+				}
+				if(category1==3){
+					font_1.draw(batch, "Интеллектуальная деятельность", (width / 4) * wpw, (-button_3_y-scroll_y+scaley + width) * hph);
+					drawer.draw(dio_4, width / 4,-button_3_y-scroll_y+scaley + width-width/16, width/2*level1/5, width/30);
+				}
+				if(category1==4){
+					font_1.draw(batch, "Творческая деятельность", (width / 4) * wpw, (-button_3_y-scroll_y+scaley + width) * hph);
+					drawer.draw(dio_5, width / 4,-button_3_y-scroll_y+scaley + width-width/16, width/2*level1/5, width/30);
+				}
+				drawer.draw(press, 0,-button_3_y-scroll_y+scaley + width-width/6, width/4, width/4);
+				font_1.draw(batch, "Требования по уровню: "+level1, (width / 4) * wpw, (-button_3_y-scroll_y+scaley + width-width/12) * hph);
+
 			}
 			String bigtext1 = bigtext;
 			if(choosed!=-1){
@@ -515,15 +684,15 @@ public class Guild extends ApplicationAdapter {
 				months = "0"+months;
 			}
 			if (scale==1) {
-				font_2.draw(batch, days + "." + months + "." + years, (width-width / 4) * wpw, (-button_3_y - scroll_y + width / 7.5f) * hph);
+				font_2.draw(batch, days + "." + months + "." + years, (width-width / 4) * wpw, (-button_3_y - scroll_y + width / 7.0f) * hph);
 			}
 			if (keyboard) {
-				drawer.draw(top, width - width / 4, -button_3_y - scroll_y + width / 7.5f + 5, 25, 25);
-				drawer.draw(bottom, width - width / 4, -button_3_y - scroll_y + width / 7.5f - 45, 25, 25);
-				drawer.draw(top, width - width / 4+35, -button_3_y - scroll_y + width / 7.5f + 5, 25, 25);
-				drawer.draw(bottom, width - width / 4+35, -button_3_y - scroll_y + width / 7.5f - 45, 25, 25);
-				drawer.draw(top, width - width / 4+70, -button_3_y - scroll_y + width / 7.5f + 5, 25, 25);
-				drawer.draw(bottom, width - width / 4+70, -button_3_y - scroll_y + width / 7.5f - 45, 25, 25);
+				drawer.draw(top, width - width / 4, -button_3_y - scroll_y + width / 7.0f + 5, 25, 25);
+				drawer.draw(bottom, width - width / 4, -button_3_y - scroll_y + width / 7.0f - 45, 25, 25);
+				drawer.draw(top, width - width / 4+35, -button_3_y - scroll_y + width / 7.0f + 5, 25, 25);
+				drawer.draw(bottom, width - width / 4+35, -button_3_y - scroll_y + width / 7.0f - 45, 25, 25);
+				drawer.draw(top, width - width / 4+70, -button_3_y - scroll_y + width / 7.0f + 5, 25, 25);
+				drawer.draw(bottom, width - width / 4+70, -button_3_y - scroll_y + width / 7.0f - 45, 25, 25);
 			}
 			drawer.draw(back_13, 0, downmenu_y-height/2, width, height/2);
 			drawer.draw(dark, 0, downmenu_y-height/2, width, height/2);
@@ -601,14 +770,14 @@ public class Guild extends ApplicationAdapter {
 			font_2.draw(batch, "Уровни видов деятельности:", (width/16) * wpw, (-profile_y+height+height/2) * hph);
 			font_2.draw(batch, "Социальная ", (width/16) * wpw, (-profile_y+height+height/2+width/20-height/8) * hph);
 			font_2.draw(batch, "Медицинская ", (width/16) * wpw, (-profile_y+height+height/2-width/10+width/20-height/8) * hph);
-			font_2.draw(batch, "Трудовая ", (width/16) * wpw, (-profile_y+height+height/2-width/10-width/10+width/20-height/8) * hph);
+			font_2.draw(batch, "Физическая ", (width/16) * wpw, (-profile_y+height+height/2-width/10-width/10+width/20-height/8) * hph);
 			font_2.draw(batch, "Интеллектуальная ", (width/16) * wpw, (-profile_y+height+height/2-width/10-width/10-width/10+width/20-height/8) * hph);
 			font_2.draw(batch, "Творческая ", (width/16) * wpw, (-profile_y+height+height/2-width/10-width/10-width/10-width/10+width/20-height/8) * hph);
 
 
 			drawer.draw(back_2, -width*0.05f, -profile_y+height+height/2+height/8, width*1.1f, height/4);
 			font_2.draw(batch, "Имя: "+account_name, (width/16) * wpw, (-profile_y+height+height/4*3) * hph);
-			drawer.draw(ding, width/4+width/8, -profile_y+height+height/4*3-height/15, width/15, width/15);
+			drawer.draw(ding, width/4+width/4, -profile_y+height+height/4*3-height/15, width/15, width/15);
 			font_2.draw(batch, "Монеты: "+account_money, (width/16f) * wpw, (-profile_y+height+height/4*3-height/20) * hph);
 			batch.end();
 			/*
@@ -626,6 +795,13 @@ public class Guild extends ApplicationAdapter {
 				shape.rectLine((x+(float)account_exp[i]*(float)Math.sin(360f/5*i*Math.PI/180)*width/4)/wpw, (y+(float)account_exp[i]*(float)Math.cos(360f/5*i*Math.PI/180)*width/4)/hph, (x+(float)account_exp[i+1]*(float)Math.sin(360f/5*(i+1)*Math.PI/180)*width/4)/wpw, (y+(float)account_exp[i+1]*(float)Math.cos(360f/5*(i+1)*Math.PI/180)*width/4)/hph, 3);
 			}
 			shape.end();*/
+		}
+	}
+	public void Sleep(int v){
+		try {
+			Thread.sleep(v);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 }

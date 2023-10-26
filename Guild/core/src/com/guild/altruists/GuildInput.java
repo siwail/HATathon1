@@ -34,6 +34,26 @@ public class GuildInput implements InputProcessor {
                 }
             }
         }
+        if (game.reg==2) {
+            if (game.register_choose == 1) {
+                if (game.account_name.length() > 0 && Input.Keys.BACKSPACE == keycode) {
+                    game.account_name = game.account_name.substring(0, game.account_name.length() - 1);
+                    backspaced = true;
+                }
+            }
+            if (game.register_choose == 2) {
+                if (game.account_login.length() > 0 && Input.Keys.BACKSPACE == keycode) {
+                    game.account_login = game.account_login.substring(0, game.account_login.length() - 1);
+                    backspaced = true;
+                }
+            }
+            if (game.register_choose == 3) {
+                if (game.account_password.length() > 0 && Input.Keys.BACKSPACE == keycode) {
+                    game.account_password = game.account_password.substring(0, game.account_password.length() - 1);
+                    backspaced = true;
+                }
+            }
+        }
         return false;
     }
     @Override
@@ -61,44 +81,64 @@ public class GuildInput implements InputProcessor {
                 }
             }
         }
+        if (game.reg==2) {
+            if (!backspaced) {
+                if (game.register_choose == 1) {
+                    if (character != '\n' && game.account_name.length() < 20) {
+                        game.account_name += character;
+                    }
+                }
+                if (game.register_choose == 2) {
+                    if (character != '\n' && game.account_login.length() < 20) {
+                        game.account_login += character;
+                    }
+                }
+                if (game.register_choose == 3) {
+                    if (character != '\n' && game.account_password.length() < 20) {
+                        game.account_password += character;
+                    }
+                }
+            }
+            backspaced = false;
+        }
         return false;
     }
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {//Нажатие на экран
         if (game.reg == 0) {
-            if (game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width - game.width / 4) && screenX <= SX(game.width - game.width / 4 + 25) && screenY >= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f + 5 + 25) && screenY <= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f + 5)) {
+            if (game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width - game.width / 4) && screenX <= SX(game.width - game.width / 4 + 25) && screenY >= SY(-game.button_3_y - game.scroll_y + game.width / 7.0f + 5 + 25) && screenY <= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f + 5)) {
                 game.dayd += 1;
                 if (game.dayd > 31) {
                     game.dayd = 1;
                 }
                 return false;
             }
-            if (game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width - game.width / 4) && screenX <= SX(game.width - game.width / 4 + 25) && screenY >= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f + 5 - 20) && screenY <= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f - 45)) {
+            if (game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width - game.width / 4) && screenX <= SX(game.width - game.width / 4 + 25) && screenY >= SY(-game.button_3_y - game.scroll_y + game.width / 7.0f + 5 - 20) && screenY <= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f - 45)) {
                 game.dayd -= 1;
                 if (game.dayd < 1) {
                     game.dayd = 31;
                 }
                 return false;
             }
-            if (game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width - game.width / 4 + 35) && screenX <= SX(game.width - game.width / 4 + 25 + 35) && screenY >= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f + 5 + 25) && screenY <= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f + 5)) {
+            if (game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width - game.width / 4 + 35) && screenX <= SX(game.width - game.width / 4 + 25 + 35) && screenY >= SY(-game.button_3_y - game.scroll_y + game.width / 7.0f + 5 + 25) && screenY <= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f + 5)) {
                 game.monthd += 1;
                 if (game.monthd > 12) {
                     game.monthd = 1;
                 }
                 return false;
             }
-            if (game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width - game.width / 4 + 35) && screenX <= SX(game.width - game.width / 4 + 25 + 35) && screenY >= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f + 5 - 20) && screenY <= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f - 45)) {
+            if (game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width - game.width / 4 + 35) && screenX <= SX(game.width - game.width / 4 + 25 + 35) && screenY >= SY(-game.button_3_y - game.scroll_y + game.width / 7.0f + 5 - 20) && screenY <= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f - 45)) {
                 game.monthd -= 1;
                 if (game.monthd < 1) {
                     game.monthd = 12;
                 }
                 return false;
             }
-            if (game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width - game.width / 4 + 70) && screenX <= SX(game.width - game.width / 4 + 25 + 70) && screenY >= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f + 5 + 25) && screenY <= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f + 5)) {
+            if (game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width - game.width / 4 + 70) && screenX <= SX(game.width - game.width / 4 + 25 + 70) && screenY >= SY(-game.button_3_y - game.scroll_y + game.width / 7.0f + 5 + 25) && screenY <= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f + 5)) {
                 game.yeard += 1;
                 return false;
             }
-            if (game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width - game.width / 4 + 70) && screenX <= SX(game.width - game.width / 4 + 25 + 70) && screenY >= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f + 5 - 20) && screenY <= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f - 45)) {
+            if (game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width - game.width / 4 + 70) && screenX <= SX(game.width - game.width / 4 + 25 + 70) && screenY >= SY(-game.button_3_y - game.scroll_y + game.width / 7.0f + 5 - 20) && screenY <= SY(-game.button_3_y - game.scroll_y + game.width / 7.5f - 45)) {
                 game.yeard -= 1;
                 return false;
             }
@@ -112,6 +152,30 @@ public class GuildInput implements InputProcessor {
                 game.sound_6.play();
                 return false;
             }
+            if (!game.profile_touched&&!game.downmenu && game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width / 2) && screenX <= SX(game.width/4*3) && screenY >= SY(-game.button_3_y-game.scroll_y+game.scaley + game.width-game.width/16+game.height/30) && screenY <= SY(-game.button_3_y-game.scroll_y+game.scaley + game.width-game.width/16)) {
+                game.level+=1;
+                if(game.level>5){
+                    game.level=5;
+                }
+                return false;
+            }
+            if (!game.profile_touched&&!game.downmenu && game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(game.width / 4) && screenX <= SX(game.width/2) && screenY >= SY(-game.button_3_y-game.scroll_y+game.scaley + game.width-game.width/16+game.height/30) && screenY <= SY(-game.button_3_y-game.scroll_y+game.scaley + game.width-game.width/16)) {
+                game.level-=1;
+                if(game.level<1){
+                    game.level=1;
+                }
+                return false;
+            }
+            if (!game.profile_touched&&!game.downmenu && game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(0) && screenX <= SX(game.width/4) && screenY >= SY(-game.button_3_y-game.scroll_y+game.scaley + game.width-game.width/6+game.width/4) && screenY <= SY(-game.button_3_y-game.scroll_y+game.scaley + game.width-game.width/6)) {
+                game.press_s-=0.25f;
+                game.sound_6.play();
+                game.category+=1;
+                if(game.category>4){
+                    game.category=0;
+                }
+                return false;
+            }
+
             //Верхний ввод
             if (!game.profile_touched&&!game.downmenu && game.choosed == -1 && game.mode == 1 && game.keyboard && screenX >= SX(0) && screenX <= SX(game.width) && screenY >= SY(game.height - game.scroll_y + game.scaley) && screenY <= SY(game.height / 4 * 3 - game.scroll_y + game.scaley)) {
                 game.textmode = 1;
@@ -230,6 +294,26 @@ public class GuildInput implements InputProcessor {
                 ty = screenY / game.hph;
             }
         }
+        if (game.reg==2) {
+            if (screenX >= SX(0) && screenX <= SX(game.width) && screenY >= SY(game.height / 2 + game.height / 10f + game.height / 20f - game.height / 30f + game.height / 60f + game.height / 30) && screenY <= SY(game.height / 2 + game.height / 10f + game.height / 20f - game.height / 30f + game.height / 60f)) {
+                Gdx.input.setOnscreenKeyboardVisible(true);
+                game.register_choose = 1;
+                game.sound_6.play();
+            }
+            if (screenX >= SX(0) && screenX <= SX(game.width) && screenY >= SY(game.height / 2 + game.height / 10f - game.height / 30f + game.height / 60f + game.height / 30) && screenY <= SY(game.height / 2 + game.height / 10f - game.height / 30f + game.height / 60f)) {
+                Gdx.input.setOnscreenKeyboardVisible(true);
+                game.register_choose = 2;
+                game.sound_6.play();
+            }
+            if (screenX >= SX(0) && screenX <= SX(game.width) && screenY >= SY(game.height / 2 + game.height / 20f - game.height / 30f + game.height / 60f + game.height / 30) && screenY <= SY(game.height / 2 + game.height / 20f - game.height / 30f + game.height / 60f)) {
+                Gdx.input.setOnscreenKeyboardVisible(true);
+                game.register_choose = 3;
+                game.sound_6.play();
+            }
+            if (game.account_name.length()>5 && game.account_password.length()>5 && game.account_login.length()>5 &&screenX >= SX(game.width/4) && screenX <= SX(game.width*2) && screenY >= SY(game.height/4+game.height/20) && screenY <= SY(game.height/4)) {
+                game.Register();
+            }
+        }
         return false;
     }
 
@@ -275,6 +359,8 @@ public class GuildInput implements InputProcessor {
                 }
                 if (game.scale * game.width <= game.stepx) {
                     game.mode = 0;
+                    game.backs[game.backo].category = game.category;
+                    game.backs[game.backo].level = game.level;
                     game.backs[game.backo].task = game.text;
                     game.backs[game.backo].bigtext = game.bigtext;
                     game.backs[game.backo].account = game.account_id;

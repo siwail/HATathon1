@@ -14,6 +14,8 @@ public class Back {
     int s = 1;
     int state=3;
     int account = 0;
+    int category=0;
+    int level=1;
     Back(Guild game, String task, int x, int y, int year, int month, int day, int hour, int state){
         g=game;
         this.x=x;

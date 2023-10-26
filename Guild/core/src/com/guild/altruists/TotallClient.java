@@ -19,12 +19,15 @@ class TotalClient extends Listener {
         TotalClient.game=game;
         Gdx.app.log("TotalServer", "Connecting...");
         client = new Client();
+        client.getKryo().register(String[].class);
+        client.getKryo().register(int[].class);
         client.getKryo().register(TotalPacket.class);
         client.start();
         client.connect(5000, ip, tcpPort, udpPort);
         client.addListener(new TotalClient());
     }
     public void received(Connection c, Object p){
+
         if(p instanceof TotalPacket){
             if (!connected) {
                 connnection = c;
@@ -32,14 +35,38 @@ class TotalClient extends Listener {
                 id=packet.id;
                 Gdx.app.log("TotalServer", "Server talking: " + packet.total);
                 connected = true;
-            }else{
-                TotalPacket packet = (TotalPacket) p;
-                game.d[0] = new TotalMove("pisyapopa.txt", 1);
-                packet = new TotalPacket(id, "client", game.d);
-                for(int i=0;i<100;i++){
-                    game.d[i] = new TotalMove("clear");
-                };
-                c.sendTCP(packet);
+            }
+            TotalPacket packet = (TotalPacket) p;
+            if (!game.file.equals("")) {
+                game.rtext = packet.text[0];
+                if (game.waiting_server) {
+                    if (game.waiting_ticks > 0) {
+                        game.result = game.rtext;
+                        game.waiting_server = false;
+                    }else{
+                        game.waiting_ticks++;
+                    }
+                }
+            }
+            packet = new TotalPacket();
+            packet.id=id;
+            if (!game.file.equals("")) {
+                game.dfile[0] = game.file;
+                game.dt[0] = 2;
+            }
+            for (int i=0;i<100;i++){
+                packet.file[i]=game.dfile[i];
+                packet.text[i]=game.dtext[i];
+                packet.t[i]=game.dt[i];
+                game.dfile[i]="";
+                game.dtext[i]="";
+                game.dt[i]=-1;
+            }
+
+            c.sendTCP(packet);
+            game.tickets+=1;
+            if(game.tickets>1000){
+                game.tickets=0;
             }
         }
     }
