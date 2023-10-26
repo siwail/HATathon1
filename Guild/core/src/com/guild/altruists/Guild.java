@@ -12,9 +12,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -45,11 +47,12 @@ import sun.awt.im.InputMethodManager;
 //Основной класс
 public class Guild extends ApplicationAdapter {
 	SpriteBatch batch;
+	ShapeRenderer shape;
 	SpriteBatchRubber drawer;
 	Preferences safes;
 	Random random = new Random();
 	Sound sound_1, sound_2, sound_3, sound_4, sound_5, sound_6;
-	Texture back_1, back_2, back_2_2, back_3, back_4, back_5, back_6, back_7, back_8, back_9, back_10, back_11, back_12, dark, up, down, full, top, bottom;//Текстуры
+	Texture back_1, back_2, back_2_2, back_3, back_4, back_5, back_6, back_7, back_8, back_9, back_10, back_11, back_12, back_13, back_14, dark, up, down, full, top, bottom, profile, white, dio_1, dio_2, dio_3, dio_4, dio_5, ding;//Текстуры
 	BitmapFont font_1, font_2, font_3, font_4, font_5;
 	FreeTypeFontGenerator generator;
 	FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -77,10 +80,12 @@ public class Guild extends ApplicationAdapter {
 	float scroll_y = 0;
 	float scaley = 0;
 	float updown_x=0;
+	float profile_y=0;
 	int mode=0;
-	int reg = 0;
+	int reg = 1;
 	int textmode=0;
 	int choosed=-1;
+	int downmenu_mode=0;
 	String text="";
 	String bigtext="";
 	int year;
@@ -95,24 +100,39 @@ public class Guild extends ApplicationAdapter {
 	boolean snd;
 	boolean touchedgreen=false;
 	boolean keyboard=false;
-	FileHandle back, enter;
+	boolean downmenu=false;
+	boolean profile_touched=false;
+	FileHandle back, enter, name, money, level;
 	int account_id = 0;
 	String account_login = "femboychik228";
 	String account_password = "lolkek2";
+	String account_name = "Егор Летов";
 	int account_money = 0;
 	int account_level = 0;
+	double[] account_exp = new double[]{0.1, 0.5, 0.9, 0.1, 1};
 	int[] account_tasks = new int[]{-1,-1,-1};
 	String[] logins = new String[300];
 	String[] passwords = new String[300];
 	int logpasq, backinfq;
+	TotalMove[] d = new TotalMove[100];
+	Guild t;
 	@Override
 	public void create () {
+		t=this;
+		for (int i=0;i<100;i++){
+			d[i]=new TotalMove("clear");
+		}
 		Gdx.app.log("", "myaaa");
-
 		enter = Gdx.files.local("enter.txt");
 		enter.writeString("", true);
 		back = Gdx.files.local("back.txt");
 		back.writeString("", true);
+		name = Gdx.files.local("name.txt");
+		name.writeString("", true);
+		money = Gdx.files.local("money.txt");
+		money.writeString("", true);
+		level = Gdx.files.local("level.txt");
+		level.writeString("", true);
 		String login_password=enter.readString();
 		int i = 0;
 		if (!login_password.equals("")) {
@@ -185,6 +205,7 @@ public class Guild extends ApplicationAdapter {
 		sound_5 = Gdx.audio.newSound(Gdx.files.internal("sound_5.mp3"));
 		sound_6 = Gdx.audio.newSound(Gdx.files.internal("sound_6.mp3"));
 		batch = new SpriteBatch();
+		shape = new ShapeRenderer();
 		safes = Gdx.app.getPreferences("Save");
 		GetSaves();
 		height = 1087.5f;
@@ -216,7 +237,6 @@ public class Guild extends ApplicationAdapter {
 		parameter.size = (int)(10.0*wpw);
 		font_3 = generator.generateFont(parameter);
 		font_3.setColor(Color.BLACK);
-
 		back_1 = new Texture("back_1.png");//Текстуры
 		back_2 = new Texture("back_2.png");
 		back_2_2 = new Texture("back_2_2.png");
@@ -230,13 +250,34 @@ public class Guild extends ApplicationAdapter {
 		back_10 = new Texture("back_10.png");
 		back_11 = new Texture("back_11.png");
 		back_12 = new Texture("back_12.png");
+		back_13 = new Texture("back_13.png");
+		back_14 = new Texture("back_14.png");
+		dio_1 = new Texture("dio_1.png");
+		dio_2 = new Texture("dio_2.png");
+		dio_3 = new Texture("dio_3.png");
+		dio_4 = new Texture("dio_4.png");
+		dio_5 = new Texture("dio_5.png");
 		dark = new Texture("dark.png");
 		up = new Texture("up.png");
 		down = new Texture("down.png");
 		full = new Texture("full.png");
 		top = new Texture("top.png");
 		bottom = new Texture("bottom.png");
+		profile = new Texture("profile.png");
+		white = new Texture("white.png");
+		ding = new Texture("ding.png");
 		Gdx.input.setInputProcessor(new GuildInput(this));
+		Thread online = new Thread(){
+			@Override
+			public void run(){
+				try {
+					TotalClient.TotalStart(t);
+				} catch (IOException | InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		online.start();
 	}
 	public void GetSaves(){
 		if(safes.contains("snd")) {
@@ -256,10 +297,20 @@ public class Guild extends ApplicationAdapter {
 		}
 		if(i!=3){
 			account_tasks[i]=choosed;
+			sound_2.play(0.5f);
 		}
 	}
 	@Override
 	public void render () {//Рендер
+		if (reg==1) {
+			ScreenUtils.clear(0, 0, 0, 1);
+			batch.begin();
+			font_4.draw(batch, "Подключение к серверу...", 100, 100);
+			batch.end();
+			if (TotalClient.connected){
+				reg=0;
+			}
+		}
 		if (reg == 0) {//Вся математика, анимации
 			for(int i=0;i<backq;i++) {
 				if (backs[i].state != 3) {
@@ -306,12 +357,22 @@ public class Guild extends ApplicationAdapter {
 				if (scale>0.9){
 					scale=1;
 				}
+				if(profile_touched){
+					profile_y+=(height-profile_y)/5;
+				}else{
+					profile_y+=(-profile_y)/5;
+				}
 				button_5_y += (-button_5_y)/5f;
 				button_1_y += (-button_1_y) / 5f;
 				button_1_s += (1-button_1_s)/5f;
 				button_2_y+=(200-button_2_y)/5f;
 				button_3_y+=(height-button_3_y)/5f;
 				button_4_y+=(height-button_4_y)/5f;
+				if(downmenu){
+					downmenu_y+=(stepy+stepy/2+width/2-downmenu_y)/5;
+				}else{
+					downmenu_y+=(-downmenu_y)/5;
+				}
 			}
 			if(choosed!=-1){
 				button_3_y=-height / 20;
@@ -464,12 +525,42 @@ public class Guild extends ApplicationAdapter {
 				drawer.draw(top, width - width / 4+70, -button_3_y - scroll_y + width / 7.5f + 5, 25, 25);
 				drawer.draw(bottom, width - width / 4+70, -button_3_y - scroll_y + width / 7.5f - 45, 25, 25);
 			}
-			drawer.draw(back_3, 0, 0, width, height/20);
-			if (choosed==-1) {
-				drawer.draw(back_4, width / 2 - 75 * button_1_s, -75 * button_1_s - button_1_y, 150 * button_1_s, 150 * button_1_s);
-				drawer.draw(back_12, width - 100, 0 - button_5_y, 100, 100);
-				font_5.draw(batch, q+"/3", (width - 150) * wpw, (- button_5_y+height/30f) * hph);
+			drawer.draw(back_13, 0, downmenu_y-height/2, width, height/2);
+			drawer.draw(dark, 0, downmenu_y-height/2, width, height/2);
+			if (downmenu_mode==0) {
+				drawer.draw(back_10, width * 0.05f, downmenu_y - height / 40 - 4, width * 0.4f, height / 40);
+				drawer.draw(back_14, width * 0.05f + width / 2, downmenu_y - height / 40 - 4, width * 0.4f, height / 40);
+			}else{
+				drawer.draw(back_14, width * 0.05f, downmenu_y - height / 40 - 4, width * 0.4f, height / 40);
+				drawer.draw(back_10, width * 0.05f + width / 2, downmenu_y - height / 40 - 4, width * 0.4f, height / 40);
 			}
+			font_5.draw(batch, "Выставленные", (width*0.1f) * wpw, (downmenu_y-height/160-4) * hph);
+			font_5.draw(batch, "Принятые", (width*0.15f+width/2) * wpw, (downmenu_y-height/160-4) * hph);
+			drawer.draw(back_3, 0, downmenu_y, width, height/20);
+			if (downmenu) {
+				if (downmenu_mode == 1) {
+					for (int i = 0; i < 3; i++) {
+						if (account_tasks[i] != -1 && backs[account_tasks[i]].state!=3) {
+							backs[account_tasks[i]].draw(i, 4 + (height / 2 - downmenu_y) / stepy);
+						}
+					}
+				}
+				if (downmenu_mode == 0) {
+					int i2 = 0;
+					for (int i = 0; i < backq; i++) {
+						if (backs[i].account == account_id && backs[i].state!=3) {
+							backs[i].draw(i2 % 3, 4 + (int) (i2 / 3) + (height / 2 - downmenu_y) / stepy);
+							i2 += 1;
+						}
+					}
+				}
+			}
+			if (choosed==-1) {
+				drawer.draw(back_4, width / 2 - 75 * button_1_s-downmenu_y*5, -75 * button_1_s - button_1_y, 150 * button_1_s, 150 * button_1_s);
+				drawer.draw(back_12, width - 100, 0 - button_5_y+downmenu_y, 100, 100);
+				font_5.draw(batch, q+"/3", (width - 150) * wpw, (downmenu_y- button_5_y+height/30f) * hph);
+			}
+
 			drawer.draw(back_9, width / 2 - 25,  -button_4_y, 50*button_4_s, 50*button_4_s);
 
 			drawer.draw(back_5, width-100, -button_2_y, 100*button_2_s, 100*button_2_s);
@@ -484,8 +575,57 @@ public class Guild extends ApplicationAdapter {
 
 			}
 
-			drawer.draw(back_3, 0, height-height/20, width, height/20);
+
+			drawer.draw(back_1, 0, -profile_y+height, width, height/2);
+			drawer.draw(back_1, 0, -profile_y+height+height/2, width, height/2);
+			drawer.draw(dark, 0, -profile_y+height, width, height);
+			drawer.draw(back_3, 0, -profile_y+height-height/20, width, height/20);
+			drawer.draw(back_14, width/4, -profile_y+height+height / 80, width * 0.5f, height / 40);
+			font_5.draw(batch, "Закрыть профиль", (width/4+width*0.05f) * wpw, (-profile_y+height+height / 30) * hph);
+			drawer.draw(profile, 25, -profile_y+height-55, 50, 50);
+			drawer.draw(back_2, -width*0.05f, -profile_y+height+height/4-height/8, width*1.1f, height/2);
+
+			drawer.draw(dark, width/2, -profile_y+height+height/2-height/8, width/2.1f, width/15);
+			drawer.draw(dark, width/2, -profile_y+height+height/2-width/10-height/8, width/2.1f, width/15);
+			drawer.draw(dark, width/2, -profile_y+height+height/2-width/10-width/10-height/8, width/2.1f, width/15);
+			drawer.draw(dark, width/2, -profile_y+height+height/2-width/10-width/10-width/10-height/8, width/2.1f, width/15);
+			drawer.draw(dark, width/2, -profile_y+height+height/2-width/10-width/10-width/10-width/10-height/8, width/2.1f, width/15);
+
+
+
+			drawer.draw(dio_1, width/2, -profile_y+height+height/2-height/8, width/2.1f*(float)account_exp[0], width/15);
+			drawer.draw(dio_2, width/2, -profile_y+height+height/2-width/10-height/8, width/2.1f*(float)account_exp[1], width/15);
+			drawer.draw(dio_3, width/2, -profile_y+height+height/2-width/10-width/10-height/8, width/2.1f*(float)account_exp[2], width/15);
+			drawer.draw(dio_4, width/2, -profile_y+height+height/2-width/10-width/10-width/10-height/8, width/2.1f*(float)account_exp[3], width/15);
+			drawer.draw(dio_5, width/2, -profile_y+height+height/2-width/10-width/10-width/10-width/10-height/8, width/2.1f*(float)account_exp[4], width/15);
+			font_2.draw(batch, "Уровни видов деятельности:", (width/16) * wpw, (-profile_y+height+height/2) * hph);
+			font_2.draw(batch, "Социальная ", (width/16) * wpw, (-profile_y+height+height/2+width/20-height/8) * hph);
+			font_2.draw(batch, "Медицинская ", (width/16) * wpw, (-profile_y+height+height/2-width/10+width/20-height/8) * hph);
+			font_2.draw(batch, "Трудовая ", (width/16) * wpw, (-profile_y+height+height/2-width/10-width/10+width/20-height/8) * hph);
+			font_2.draw(batch, "Интеллектуальная ", (width/16) * wpw, (-profile_y+height+height/2-width/10-width/10-width/10+width/20-height/8) * hph);
+			font_2.draw(batch, "Творческая ", (width/16) * wpw, (-profile_y+height+height/2-width/10-width/10-width/10-width/10+width/20-height/8) * hph);
+
+
+			drawer.draw(back_2, -width*0.05f, -profile_y+height+height/2+height/8, width*1.1f, height/4);
+			font_2.draw(batch, "Имя: "+account_name, (width/16) * wpw, (-profile_y+height+height/4*3) * hph);
+			drawer.draw(ding, width/4+width/8, -profile_y+height+height/4*3-height/15, width/15, width/15);
+			font_2.draw(batch, "Монеты: "+account_money, (width/16f) * wpw, (-profile_y+height+height/4*3-height/20) * hph);
 			batch.end();
+			/*
+			shape.begin(ShapeRenderer.ShapeType.Filled);
+
+			float x=width/2;
+			float y=-profile_y+height+height/4;
+			shape.setColor(0, 0, 0, 1);
+			for(int i=0;i<5;i++) {
+				shape.rectLine(x/wpw, y/hph, (x+(float)Math.sin(360f/5*i*Math.PI/180)*width/4)/wpw, (y+(float)Math.cos(360f/5*i*Math.PI/180)*width/4)/hph, 2);
+			}
+			shape.setColor(0.5f, 0, 0, 1);
+			shape.rectLine((x+(float)account_exp[0]*(float)Math.sin(360f/5*0*Math.PI/180)*width/4)/wpw, (y+(float)account_exp[0]*(float)Math.cos(360f/5*0*Math.PI/180)*width/4)/hph, (x+(float)account_exp[4]*(float)Math.sin(360f/5*(4)*Math.PI/180)*width/4)/wpw, (y+(float)account_exp[4]*(float)Math.cos(360f/5*(4)*Math.PI/180)*width/4)/hph, 3);
+			for(int i=0;i<4;i++) {
+				shape.rectLine((x+(float)account_exp[i]*(float)Math.sin(360f/5*i*Math.PI/180)*width/4)/wpw, (y+(float)account_exp[i]*(float)Math.cos(360f/5*i*Math.PI/180)*width/4)/hph, (x+(float)account_exp[i+1]*(float)Math.sin(360f/5*(i+1)*Math.PI/180)*width/4)/wpw, (y+(float)account_exp[i+1]*(float)Math.cos(360f/5*(i+1)*Math.PI/180)*width/4)/hph, 3);
+			}
+			shape.end();*/
 		}
 	}
 }
