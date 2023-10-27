@@ -24,7 +24,7 @@ public class Guild extends ApplicationAdapter {
 	Preferences safes;
 	Random random = new Random();
 	Sound sound_1, sound_2, sound_3, sound_4, sound_5, sound_6;
-	Texture back_1, back_2, back_2_2, back_3, back_4, back_5, back_6, back_7, back_8, back_9, back_10, back_11, back_12, back_13, back_14, dark, up, down, full, top, bottom, profile, white, dio_1, dio_2, dio_3, dio_4, dio_5, ding, press, star, star2;//Текстуры
+	Texture back_1, back_2, back_2_2, back_3, back_4, back_5, back_6, back_7, back_8, back_9, back_10, back_11, back_12, back_13, back_14, dark, up, down, full, top, bottom, profile, white, dio_1, dio_2, dio_3, dio_4, dio_5, ding, press, star, star2, letter;//Текстуры
 	BitmapFont font_1, font_2, font_3, font_4, font_5, font_6, font_7;
 	FreeTypeFontGenerator generator;
 	FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -109,7 +109,6 @@ public class Guild extends ApplicationAdapter {
 		}
 
 		safes = Gdx.app.getPreferences("Save");
-
 		GetSaves();
 		int i = 0;
 		/*enter = Gdx.files.local("enter.txt");
@@ -267,6 +266,7 @@ public class Guild extends ApplicationAdapter {
 		press = new Texture("press.png");
 		star = new Texture("star.png");
 		star2 = new Texture("star2.png");
+		letter = new Texture("letter.png");
 		Gdx.input.setInputProcessor(new GuildInput(this));
 		Thread online = new Thread(){
 			@Override
@@ -790,6 +790,7 @@ public class Guild extends ApplicationAdapter {
 			font_2.draw(batch, "Имя: "+account_name, (width/16) * wpw, (-profile_y+height+height/4*3) * hph);
 			drawer.draw(ding, width/4+width/4, -profile_y+height+height/4*3-height/15, width/15, width/15);
 			font_2.draw(batch, "Монеты: "+account_money, (width/16f) * wpw, (-profile_y+height+height/4*3-height/20) * hph);
+			drawer.draw(letter, 10, -profile_y+height+height/2+height/3.5f, 80, 80);
 
 			if(downmenu_touched){
 				drawer.draw(dark, 0, 0, width, height);
