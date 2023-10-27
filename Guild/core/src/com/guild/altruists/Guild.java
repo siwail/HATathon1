@@ -107,7 +107,9 @@ public class Guild extends ApplicationAdapter {
 			dtext[i]="";
 			dt[i]=-1;
 		}
+
 		safes = Gdx.app.getPreferences("Save");
+
 		GetSaves();
 		int i = 0;
 		/*enter = Gdx.files.local("enter.txt");
@@ -285,7 +287,17 @@ public class Guild extends ApplicationAdapter {
 				for (int i = 0; i < backq; i++) {
 					if (backs[i].state != 3) {
 						dt[3] = 0;
-						dtext[3] = backs[i].x + "&" + backs[i].y + "&" + backs[i].task + "&" + backs[i].bigtext + "&" + backs[i].year + "&" + backs[i].month + "&" + backs[i].day + "&" + backs[i].index + "&" + backs[i].account + "&" + backs[i].category + "&" + backs[i].level + "&" + backs[i].doit;
+						int doit=backs[i].doit;
+						if(account_tasks[0]==i){
+							doit=account_id;
+						}
+						if(account_tasks[1]==i){
+							doit=account_id;
+						}
+						if(account_tasks[2]==i){
+							doit=account_id;
+						}
+						dtext[3] = backs[i].x + "&" + backs[i].y + "&" + backs[i].task + "&" + backs[i].bigtext + "&" + backs[i].year + "&" + backs[i].month + "&" + backs[i].day + "&" + backs[i].index + "&" + backs[i].account + "&" + backs[i].category + "&" + backs[i].level + "&" + doit;
 						dfile[3] = "/backs/back_"+i+".txt";
 					}
 				}
@@ -349,7 +361,7 @@ public class Guild extends ApplicationAdapter {
 				safes.putInteger("account_id", account_id);
 				safes.flush();
 				Sleep(1000);
-				reg=0;
+				reg=1;
 			}
 		};
 		register.start();

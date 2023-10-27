@@ -306,6 +306,27 @@ public class GuildInput implements InputProcessor {
                 game.dt[4]=0;
                 game.dtext[4]="";
                 game.dfile[4]="/backs/back_"+game.downmenu_touched_id+".txt";
+                float exp1=0,exp2=0,exp3=0,exp4=0,exp5=0;
+                if(game.backs[game.downmenu_touched_id].category==0){
+                    exp1=0.1f*game.downmenu_touched_level;
+                }
+                if(game.backs[game.downmenu_touched_id].category==1){
+                    exp2=0.1f*game.downmenu_touched_level;
+                }
+                if(game.backs[game.downmenu_touched_id].category==2){
+                    exp3=0.1f*game.downmenu_touched_level;
+                }
+                if(game.backs[game.downmenu_touched_id].category==3){
+                    exp4=0.1f*game.downmenu_touched_level;
+                }
+                if(game.backs[game.downmenu_touched_id].category==4){
+                    exp5=0.1f*game.downmenu_touched_level;
+                }
+                String str = game.GetServer("/logins/"+game.backs[game.downmenu_touched_id].doit+".txt");
+                String[] splitted = str.split("&");
+                game.dt[5]=0;
+                game.dtext[5]=splitted[0]+"&"+splitted[1]+"&"+splitted[2]+"&"+(splitted[3]+game.downmenu_touched_level)+"&"+(splitted[4]+exp1)+"&"+(splitted[5]+exp2)+"&"+(splitted[6]+exp3)+"&"+(splitted[7]+exp4)+"&"+(splitted[8]+exp5)+"&"+splitted[9]+"&"+splitted[10]+"&"+splitted[11];
+                game.dfile[5]="/logins/"+game.backs[game.downmenu_touched_id].doit+".txt";
                 game.downmenu_touched_id=-1;
                 return false;
             }
