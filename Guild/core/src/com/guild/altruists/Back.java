@@ -16,6 +16,7 @@ public class Back {
     int account = 0;
     int category=0;
     int level=1;
+    int doit=-1;
     Back(Guild game, String task, int x, int y, int year, int month, int day, int hour, int state){
         g=game;
         this.x=x;
@@ -30,6 +31,23 @@ public class Back {
     }
     public void draw(){//Отрисовка листов
         g.drawer.draw(g.back_2, g.stepx/(g.backn*3)+x* g.stepx, -g.cy+g.height-g.stepy-y*g.stepy, g.stepx, g.stepy);
+        g.drawer.draw(g.dark, g.stepx / (g.backn * 3) + x * g.stepx-2, -g.cy + g.height - g.stepy - y * g.stepy-2, g.stepx / 10+4, g.stepy / 10+4);
+
+        if(category==0) {
+            g.drawer.draw(g.dio_1, g.stepx / (g.backn * 3) + x * g.stepx, -g.cy + g.height - g.stepy - y * g.stepy, g.stepx / 10, g.stepy / 10);
+        }
+        if(category==1) {
+            g.drawer.draw(g.dio_2, g.stepx / (g.backn * 3) + x * g.stepx, -g.cy + g.height - g.stepy - y * g.stepy, g.stepx / 10, g.stepy / 10);
+        }
+        if(category==2) {
+            g.drawer.draw(g.dio_3, g.stepx / (g.backn * 3) + x * g.stepx, -g.cy + g.height - g.stepy - y * g.stepy, g.stepx / 10, g.stepy / 10);
+        }
+        if(category==3) {
+            g.drawer.draw(g.dio_4, g.stepx / (g.backn * 3) + x * g.stepx, -g.cy + g.height - g.stepy - y * g.stepy, g.stepx / 10, g.stepy / 10);
+        }
+        if(category==4) {
+            g.drawer.draw(g.dio_5, g.stepx / (g.backn * 3) + x * g.stepx, -g.cy + g.height - g.stepy - y * g.stepy, g.stepx / 10, g.stepy / 10);
+        }
         String text1 = task.substring(0, task.length());
         String text2 = "";
         String text3 = "";
@@ -50,7 +68,7 @@ public class Back {
             text4 = task.substring(60, task.length());
         }
         if (g.account_id==account) {
-            g.font_4.draw(g.batch, "Ваша заявка!", (g.stepx / (g.backn * 3) + x * g.stepx + g.stepx / 8) * g.wpw, (-g.cy + g.height - y * g.stepy - g.stepy/8) * g.hph);
+            g.font_7.draw(g.batch, "Ваша заявка!", (g.stepx / (g.backn * 3) + x * g.stepx + g.stepx / 8) * g.wpw, (-g.cy + g.height - y * g.stepy - g.stepy/8) * g.hph);
         }
         if (task.length()<=10) {
             g.font_1.draw(g.batch, task, (g.stepx / (g.backn * 3) + x * g.stepx + g.stepx / 8) * g.wpw, (-g.cy + g.height - y * g.stepy - g.stepy / 4) * g.hph);
@@ -65,6 +83,22 @@ public class Back {
     }
     public void draw(float x, float y){//Отрисовка листов
         g.drawer.draw(g.back_2, g.stepx/(g.backn*3)+x* g.stepx, g.height-g.stepy-y*g.stepy, g.stepx, g.stepy);
+        g.drawer.draw(g.dark, g.stepx / (g.backn * 3) + x * g.stepx-2,  g.height - g.stepy - y * g.stepy-2, g.stepx / 10+4, g.stepy / 10+4);
+        if(category==0) {
+            g.drawer.draw(g.dio_1, g.stepx / (g.backn * 3) + x * g.stepx,  g.height - g.stepy - y * g.stepy, g.stepx / 10, g.stepy / 10);
+        }
+        if(category==1) {
+            g.drawer.draw(g.dio_2, g.stepx / (g.backn * 3) + x * g.stepx,  g.height - g.stepy - y * g.stepy, g.stepx / 10, g.stepy / 10);
+        }
+        if(category==2) {
+            g.drawer.draw(g.dio_3, g.stepx / (g.backn * 3) + x * g.stepx,  g.height - g.stepy - y * g.stepy, g.stepx / 10, g.stepy / 10);
+        }
+        if(category==3) {
+            g.drawer.draw(g.dio_4, g.stepx / (g.backn * 3) + x * g.stepx,  g.height - g.stepy - y * g.stepy, g.stepx / 10, g.stepy / 10);
+        }
+        if(category==4) {
+            g.drawer.draw(g.dio_5, g.stepx / (g.backn * 3) + x * g.stepx,  g.height - g.stepy - y * g.stepy, g.stepx / 10, g.stepy / 10);
+        }
         String text1 = task.substring(0, task.length());
         String text2 = "";
         String text3 = "";
@@ -85,7 +119,7 @@ public class Back {
             text4 = task.substring(60, task.length());
         }
         if (g.account_id==account) {
-            g.font_4.draw(g.batch, "Ваша заявка!", (g.stepx / (g.backn * 3) + x * g.stepx + g.stepx / 8) * g.wpw, ( + g.height - y * g.stepy - g.stepy/8) * g.hph);
+            g.font_7.draw(g.batch, "Ваша заявка!", (g.stepx / (g.backn * 3) + x * g.stepx + g.stepx / 8) * g.wpw, ( + g.height - y * g.stepy - g.stepy/8) * g.hph);
         }
         if (task.length()<=10) {
             g.font_1.draw(g.batch, task, (g.stepx / (g.backn * 3) + x * g.stepx + g.stepx / 8) * g.wpw, ( + g.height - y * g.stepy - g.stepy / 4) * g.hph);

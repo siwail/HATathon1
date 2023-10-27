@@ -233,7 +233,7 @@ public class GuildInput implements InputProcessor {
                         break;
                     }
                 }
-                if (a) {
+                if (a&&game.backs[game.choosed].doit==-1) {
                     game.mode = 0;
                     game.button_4_s -= 0.1f;
                     game.full_mode = false;
@@ -242,14 +242,14 @@ public class GuildInput implements InputProcessor {
                 }
                 return false;
             }
-            if (!game.profile_touched&&game.mode == 0 && screenX >= SX(game.width - 100) && screenX <= SX(game.width) && screenY >= SY(game.downmenu_y + 100) && screenY <= SY(game.downmenu_y)) {
+            if (!game.downmenu_touched&&!game.profile_touched&&game.mode == 0 && screenX >= SX(game.width - 100) && screenX <= SX(game.width) && screenY >= SY(game.downmenu_y + 100) && screenY <= SY(game.downmenu_y)) {
                 game.downmenu = !game.downmenu;
             }
-            if (!game.profile_touched&&game.mode == 0 && game.downmenu && screenX >= SX(game.width * 0.05f) && screenX <= SX(game.width * 0.45f) && screenY >= SY(game.downmenu_y - game.height / 40 - 4 + game.height / 40) && screenY <= SY(game.downmenu_y - game.height / 40 - 4)) {
+            if (!game.downmenu_touched&&!game.profile_touched&&game.mode == 0 && game.downmenu && screenX >= SX(game.width * 0.05f) && screenX <= SX(game.width * 0.45f) && screenY >= SY(game.downmenu_y - game.height / 40 - 4 + game.height / 40) && screenY <= SY(game.downmenu_y - game.height / 40 - 4)) {
                 game.downmenu_mode = 0;
                 return false;
             }
-            if (!game.profile_touched&&game.mode == 0 && game.downmenu && screenX >= SX(game.width * 0.5f) && screenX <= SX(game.width) && screenY >= SY(game.downmenu_y - game.height / 40 - 4 + game.height / 40) && screenY <= SY(game.downmenu_y - game.height / 40 - 4)) {
+            if (!game.downmenu_touched&&!game.profile_touched&&game.mode == 0 && game.downmenu && screenX >= SX(game.width * 0.5f) && screenX <= SX(game.width) && screenY >= SY(game.downmenu_y - game.height / 40 - 4 + game.height / 40) && screenY <= SY(game.downmenu_y - game.height / 40 - 4)) {
                 game.downmenu_mode = 1;
                 return false;
             }
@@ -266,6 +266,71 @@ public class GuildInput implements InputProcessor {
             if(game.profile_touched&&game.mode == 0 && screenX >= SX(game.width/4) && screenX <= SX(game.width*0.75f) && screenY >= SY(game.height/20) && screenY <= SY(0)){
                 game.profile_touched=false;
             }
+            if(!game.downmenu_touched&&!game.profile_touched&&game.mode == 0&&game.downmenu && screenX >= SX(0) && screenX <= SX(game.width) && screenY >= SY(game.height/2) && screenY <= SY(0)) {
+                if (game.downmenu_mode == 0) {
+                    int i2 = 0;
+                    for (int i = 0; i < game.backq; i++) {
+                        if (game.backs[i].account == game.account_id && game.backs[i].state!=3) {
+                            Gdx.app.log("", "");
+                            //backs[i].draw(i2 % 3, 4 + (int) (i2 / 3) + (height / 2 - downmenu_y) / stepy);
+                            if(screenX >= SX(game.stepx/(game.backn*3)+i2 % 3*game.stepx) && screenX <= SX(game.stepx/(game.backn*3)+i2 % 3*game.stepx+game.stepx) && screenY >= SY(game.height-game.stepy-(4 + (int) (i2 / 3) + (game.height / 2 - game.downmenu_y) / game.stepy)*game.stepy+game.stepy) && screenY <= SY(game.height-game.stepy-(4 + (int) (i2 / 3) + (game.height / 2 - game.downmenu_y) / game.stepy)*game.stepy)){
+
+                                game.downmenu_touched=true;
+                                game.downmenu_touched_id=i;
+                                game.downmenu_touched_name = "";
+                                game.downmenu_touched_login = "";
+                                if(game.backs[i].doit!=-1) {
+                                    game.downmenu_touched_name = "";
+                                    game.downmenu_touched_login = "";
+                                    String getted = game.GetServer("/logins/"+game.backs[i].doit+".txt");
+                                    String[] split_getted = getted.split("&");
+                                    game.downmenu_touched_name = split_getted[0];
+                                    game.downmenu_touched_login = split_getted[2];
+                                }
+                                return false;
+                            }
+                            i2 += 1;
+                        }
+                    }
+                }
+                return false;
+            }
+            if(game.downmenu_touched&&game.mode == 0&&screenX >= SX(game.width/2-25) && screenX <= SX(game.width/2+25) && screenY >= SY(50+game.height/4+50) && screenY <= SY(50+game.height/4)){
+                game.downmenu_touched=false;
+                game.downmenu_touched_id=-1;
+                return false;
+            }
+            if(game.downmenu_touched&&game.backs[game.downmenu_touched_id].doit!=-1&&game.mode == 0&&screenX >= SX(game.width/4) && screenX <= SX(game.width*0.75f) && screenY >= SY(200+game.height / 4+game.height / 4*(1-game.button_6_s+game.height/20)+game.height/40) && screenY <= SY(200+game.height / 4+game.height / 4*(1-game.button_6_s)+game.height/40)){
+                game.downmenu_touched=false;
+                game.backs[game.downmenu_touched_id].state=3;
+                game.dt[4]=0;
+                game.dtext[4]="";
+                game.dfile[4]="/backs/back_"+game.downmenu_touched_id+".txt";
+                game.downmenu_touched_id=-1;
+                return false;
+            }
+            if(game.downmenu_touched&&game.mode == 0&&screenX >= SX(0) && screenX <= SX(game.width/5) && screenY >= SY(game.height/2-game.height/8+game.width/5) && screenY <= SY(game.height/2-game.height/8)) {
+                game.downmenu_touched_level=1;
+                return false;
+            }
+            if(game.downmenu_touched&&game.mode == 0&&screenX >= SX(game.width/5) && screenX <= SX(game.width/5+game.width/5) && screenY >= SY(game.height/2-game.height/8+game.width/5) && screenY <= SY(game.height/2-game.height/8)) {
+                game.downmenu_touched_level=2;
+                return false;
+            }
+            if(game.downmenu_touched&&game.mode == 0&&screenX >= SX(game.width/5+game.width/5) && screenX <= SX(game.width/5+game.width/5+game.width/5) && screenY >= SY(game.height/2-game.height/8+game.width/5) && screenY <= SY(game.height/2-game.height/8)) {
+                game.downmenu_touched_level=3;
+                return false;
+            }
+            if(game.downmenu_touched&&game.mode == 0&&screenX >= SX(game.width/5+game.width/5+game.width/5) && screenX <= SX(game.width/5+game.width/5+game.width/5+game.width/5) && screenY >= SY(game.height/2-game.height/8+game.width/5) && screenY <= SY(game.height/2-game.height/8)) {
+                game.downmenu_touched_level=4;
+                return false;
+            }
+            if(game.downmenu_touched&&game.mode == 0&&screenX >= SX(game.width/5+game.width/5+game.width/5+game.width/5) && screenX <= SX(game.width/5+game.width/5+game.width/5+game.width/5+game.width/5) && screenY >= SY(game.height/2-game.height/8+game.width/5) && screenY <= SY(game.height/2-game.height/8)) {
+                game.downmenu_touched_level=5;
+                return false;
+            }
+
+
                 if (game.mode == 0) {
                 ly = game.cy;
                 ty = screenY / game.hph;
@@ -368,6 +433,7 @@ public class GuildInput implements InputProcessor {
                     game.backs[game.backo].year = game.yeard;
                     game.backs[game.backo].month = game.monthd;
                     game.backs[game.backo].day = game.dayd;
+                    game.backs[game.backo].doit = -1;
                     game.AddBack();
                     game.backo += 1;
                     game.sound_1.play();

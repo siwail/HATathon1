@@ -2,11 +2,8 @@ package com.guild.altruists;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -14,36 +11,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.sun.nio.sctp.Notification;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Random;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.utils.ScreenUtils;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Random;
-import java.util.regex.Pattern;
-
-import javax.naming.Context;
-
-import sun.awt.im.InputMethodManager;
 //Основной класс
 public class Guild extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -52,8 +24,8 @@ public class Guild extends ApplicationAdapter {
 	Preferences safes;
 	Random random = new Random();
 	Sound sound_1, sound_2, sound_3, sound_4, sound_5, sound_6;
-	Texture back_1, back_2, back_2_2, back_3, back_4, back_5, back_6, back_7, back_8, back_9, back_10, back_11, back_12, back_13, back_14, dark, up, down, full, top, bottom, profile, white, dio_1, dio_2, dio_3, dio_4, dio_5, ding, press;//Текстуры
-	BitmapFont font_1, font_2, font_3, font_4, font_5, font_6;
+	Texture back_1, back_2, back_2_2, back_3, back_4, back_5, back_6, back_7, back_8, back_9, back_10, back_11, back_12, back_13, back_14, dark, up, down, full, top, bottom, profile, white, dio_1, dio_2, dio_3, dio_4, dio_5, ding, press, star, star2;//Текстуры
+	BitmapFont font_1, font_2, font_3, font_4, font_5, font_6, font_7;
 	FreeTypeFontGenerator generator;
 	FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 	public static final String FONT_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;,{}\"´`'<>:";
@@ -76,6 +48,7 @@ public class Guild extends ApplicationAdapter {
 	float button_4_y=200;
 	float button_4_s=1;
 	float button_5_y=0;
+	float button_6_s=1;
 	float downmenu_y=0;
 	float scroll_y = 0;
 	float scaley = 0;
@@ -89,6 +62,10 @@ public class Guild extends ApplicationAdapter {
 	int textmode=0;
 	int choosed=-1;
 	int downmenu_mode=0;
+	int downmenu_touched_id=-1;
+	int downmenu_touched_level = 1;
+	String downmenu_touched_name;
+	String downmenu_touched_login;
 	String text="";
 	String bigtext="";
 	int year;
@@ -107,6 +84,7 @@ public class Guild extends ApplicationAdapter {
 	boolean downmenu=false;
 	boolean profile_touched=false;
 	volatile boolean waiting_server=false;
+	boolean downmenu_touched=false;
 	int waiting_ticks=0;
 	int tickets = 0;
 	int account_id = -1;
@@ -242,6 +220,13 @@ public class Guild extends ApplicationAdapter {
 		parameter.size = (int)(15.0*wpw);
 		font_4 = generator.generateFont(parameter);
 		font_4.setColor(Color.GOLD);
+		parameter.borderWidth =1f;
+		parameter.borderColor = Color.BLACK;
+		parameter.size = (int)(15.0*wpw);
+		font_7 = generator.generateFont(parameter);
+		font_7.setColor(Color.OLIVE);
+		parameter.borderWidth =0.5f;
+		parameter.borderColor = Color.WHITE;
 		parameter.size = (int)(35.0*wpw);
 		font_6 = generator.generateFont(parameter);
 		font_6.setColor(Color.GOLD);
@@ -278,6 +263,8 @@ public class Guild extends ApplicationAdapter {
 		white = new Texture("white.png");
 		ding = new Texture("ding.png");
 		press = new Texture("press.png");
+		star = new Texture("star.png");
+		star2 = new Texture("star2.png");
 		Gdx.input.setInputProcessor(new GuildInput(this));
 		Thread online = new Thread(){
 			@Override
@@ -298,7 +285,7 @@ public class Guild extends ApplicationAdapter {
 				for (int i = 0; i < backq; i++) {
 					if (backs[i].state != 3) {
 						dt[3] = 0;
-						dtext[3] = backs[i].x + "&" + backs[i].y + "&" + backs[i].task + "&" + backs[i].bigtext + "&" + backs[i].year + "&" + backs[i].month + "&" + backs[i].day + "&" + backs[i].index + "&" + backs[i].account + "&" + backs[i].category + "&" + backs[i].level;
+						dtext[3] = backs[i].x + "&" + backs[i].y + "&" + backs[i].task + "&" + backs[i].bigtext + "&" + backs[i].year + "&" + backs[i].month + "&" + backs[i].day + "&" + backs[i].index + "&" + backs[i].account + "&" + backs[i].category + "&" + backs[i].level + "&" + backs[i].doit;
 						dfile[3] = "/backs/back_"+i+".txt";
 					}
 				}
@@ -342,10 +329,12 @@ public class Guild extends ApplicationAdapter {
 				break;
 			}
 		}
-		if(i!=3){
+		if(i!=3&&backs[choosed].doit==-1){
 			account_tasks[i]=choosed;
+			backs[choosed].doit=account_id;
 			sound_2.play(0.5f);
 			UpdatePerson();
+			UpdateBacks();
 		}
 	}
 	public void Register(){
@@ -388,7 +377,7 @@ public class Guild extends ApplicationAdapter {
 				drawer.draw(back_11, width/8, height/2+height/20f-height/30f+height/60f+width/40, width/40, width/40);
 			}
 			font_5.draw(batch, "Ваше имя: "+account_name, (width/6)*wpw, (height/2+height/10f+height/20f)*hph);
-			font_5.draw(batch, "Ваш логин: "+account_login, (width/6)*wpw, (height/2+height/10f)*hph);
+			font_5.draw(batch, "Ваша почта: "+account_login, (width/6)*wpw, (height/2+height/10f)*hph);
 			font_5.draw(batch, "Ваш пароль: "+account_password, (width/6)*wpw, (height/2+height/20f)*hph);
 			drawer.draw(back_10, width/4, height/4, width/2, height/20);
 			font_4.draw(batch, "Зарегистрироваться", (width/4+width/15)*wpw, (height/4+height/40f)*hph);
@@ -437,6 +426,7 @@ public class Guild extends ApplicationAdapter {
 									backs[i].account=Integer.parseInt(splitted[8]);
 									backs[i].category=Integer.parseInt(splitted[9]);
 									backs[i].level=Integer.parseInt(splitted[10]);
+									backs[i].doit=Integer.parseInt(splitted[11]);
 								}
 							}
 
@@ -511,6 +501,11 @@ public class Guild extends ApplicationAdapter {
 					downmenu_y+=(-downmenu_y)/5;
 				}
 			}
+			if(downmenu_touched){
+				button_6_s+=(1-button_6_s)/5;
+			}else{
+				button_6_s+=(0.5f-button_6_s)/5;
+			}
 			press_s+=(1-press_s);
 			if(choosed!=-1){
 				button_3_y=-height / 20;
@@ -574,8 +569,12 @@ public class Guild extends ApplicationAdapter {
 						}
 					}
 					if(a) {
-						font_4.draw(batch, "Принять задание!", (width * 0.25f + width * 0.1f) * wpw, (-button_3_y - scroll_y + width / 20 + width / 80) * hph);
-					}else{
+						if(backs[choosed].doit==-1) {
+							font_4.draw(batch, "Принять задание!", (width * 0.25f + width * 0.1f) * wpw, (-button_3_y - scroll_y + width / 20 + width / 80) * hph);
+						}else{
+							font_4.draw(batch, "Задание уже выбрано", (width * 0.25f) * wpw, (-button_3_y - scroll_y + width / 20 + width / 80) * hph);
+						}
+						}else{
 						font_4.draw(batch, "Взято заданий "+q+"/3", (width * 0.25f + width * 0.1f) * wpw, (-button_3_y - scroll_y + width / 20 + width / 80) * hph);
 					}
 				}
@@ -779,6 +778,29 @@ public class Guild extends ApplicationAdapter {
 			font_2.draw(batch, "Имя: "+account_name, (width/16) * wpw, (-profile_y+height+height/4*3) * hph);
 			drawer.draw(ding, width/4+width/4, -profile_y+height+height/4*3-height/15, width/15, width/15);
 			font_2.draw(batch, "Монеты: "+account_money, (width/16f) * wpw, (-profile_y+height+height/4*3-height/20) * hph);
+
+			if(downmenu_touched){
+				drawer.draw(dark, 0, 0, width, height);
+				drawer.draw(back_2, -width * (0.5f) + (1 - scale) * width / 2+(1 -button_6_s) * width / 2+ width / 2 - width / 20, (1 - scale) * height+(1 - button_6_s) * height / 2+height / 4, width * 1.1f * scale*button_6_s, (width+scaley) * 1.1f * scale*button_6_s);
+				drawer.draw(back_9, width / 2 - 25,  50+height / 4+height / 4*(1-button_6_s), 50, 50);
+				if(backs[downmenu_touched_id].doit!=-1) {
+					font_2.draw(batch, "Имя исполнителя: " + downmenu_touched_name, (width / 16) * wpw, (height / 2 + height / 8) * hph);
+					font_2.draw(batch, "Почта исполнителя: " + downmenu_touched_login, (width / 16) * wpw, (height / 2 + height / 8 - height / 20) * hph);
+					font_2.draw(batch, "Оцените качество выполнения задачи.", (width / 16) * wpw, (height / 2 - height / 8) * hph);
+					for (int i=0;i<5;i++){
+						if(i+1<=downmenu_touched_level) {
+							drawer.draw(star, width / 5 * i, height / 2-height/8, width / 5, width / 5);
+						}else{
+							drawer.draw(star2, width / 5 * i, height / 2-height/8, width / 5, width / 5);
+						}
+					}
+					drawer.draw(back_10, width / 4,  200+height / 4+height / 4*(1-button_6_s)+height/40, width/2, height/20);
+					font_4.draw(batch, "Наградить", (width / 4+width/8) * wpw, (200+height / 4+height / 4*(1-button_6_s)+height/40+height/40) * hph);
+				}else{
+					font_2.draw(batch, "Еще никто не взялся за эту работу.", (width / 16) * wpw, (height / 2 + height / 8) * hph);
+				}
+			}
+
 			batch.end();
 			/*
 			shape.begin(ShapeRenderer.ShapeType.Filled);
